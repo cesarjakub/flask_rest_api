@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, abort, request, redirect, url_for, session, flash
+from flask import Flask, render_template, jsonify, abort, request, redirect, url_for, session
 from dotenv import load_dotenv
 from flask_mysqldb import MySQL
 import os
@@ -27,12 +27,12 @@ def get_all_blog_posts():
     cursor.close()
     return jsonify(blog_posts)
 
-@app.route('/api/blog/<int:blog_id>', methods=['GET'])
-def get_blog_post(blog_id):
+@app.route('/api/blog/<int:id>', methods=['GET'])
+def get_blog_post(id):
     if "user" not in session:
         return redirect(url_for("login"))
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM blog_posts WHERE post_id = %s", (blog_id,))
+    cursor.execute("SELECT * FROM blog_posts WHERE post_id = %s", (id,))
     blog_post = cursor.fetchone()
     if blog_post:
         return jsonify(blog_post)
@@ -40,7 +40,7 @@ def get_blog_post(blog_id):
         return abort(404)
 
 
-@app.route("/")
+@app.route("/", methods=["POST", "GET"])
 def index():
     if "user" in session:
         user = session["user"]
@@ -48,6 +48,14 @@ def index():
         cursor.execute("SELECT * FROM blog_posts INNER JOIN users on blog_posts.author_id = users.user_id")
         blog_posts = cursor.fetchall()
         cursor.close()
+        if request.method == "POST":
+            title = request.form["title"]
+            content = request.form["content"]
+            cursor = mysql.connection.cursor()
+            cursor.execute("INSERT INTO blog_posts (title, content, author_id) VALUES(%s, %s, %s)", (title, content, user[0]))
+            mysql.connection.commit()
+            cursor.close()
+            return redirect(url_for("index"))
         return render_template("index.html", blog_posts=blog_posts)
     else:
         return redirect(url_for("login"))
@@ -86,7 +94,7 @@ def register():
         email = request.form["email"]
         password = request.form["pass"]
         cursor = mysql.connection.cursor()
-        cursor.execute("INSERT INTO users (username, email, password_hash) VALUES(%s, %s, %s)", (username, email, password))
+        cursor.execute("INSERT INTO users (username, email, pass) VALUES(%s, %s, %s)", (username, email, password))
         mysql.connection.commit()
         cursor.close()
         return redirect(url_for("login"))
