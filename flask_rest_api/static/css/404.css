@@ -1,0 +1,41 @@
+body {
+    background-color: #f8f9fa;
+    font-family: "Roboto", sans-serif;
+  }
+
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .error-code {
+    font-size: 10rem;
+    font-weight: bold;
+    color: #343a40;
+  }
+
+  .error-message {
+    font-size: 2rem;
+    margin-top: 20px;
+    color: #6c757d;
+  }
+
+  .back-to-home {
+    margin-top: 30px;
+  }
+
+  .back-to-home a {
+    text-decoration: none;
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    transition: background-color 0.3s ease;
+  }
+
+  .back-to-home a:hover {
+    background-color: #0056b3;
+  }
