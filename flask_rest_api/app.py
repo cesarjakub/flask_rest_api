@@ -39,6 +39,23 @@ def get_blog_post(id):
     else:
         return abort(404)
     
+@app.route('/api/blog/', methods=['POST'])
+def add_blog_post():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    data = request.get_json()
+    title = data.get('title')
+    content = data.get('content')
+    author_id = data.get('author_id')
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("INSERT INTO blog_posts (title, content, author_id) VALUES(%s, %s, %s)", (title, content, author_id[0]))
+    mysql.connection.commit()
+    cursor.close()
+
+    return jsonify({"message": "Nový příspěvek byl úspěšně přidán"})
+    
 @app.route('/api/blog/<int:id>', methods=['DELETE'])
 def delete_blog_post(id):
     if "user" not in session:
