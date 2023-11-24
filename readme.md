@@ -1,4 +1,4 @@
-# Název Vaší Aplikace
+# FLASK REST API
 
 ## Popis
 
