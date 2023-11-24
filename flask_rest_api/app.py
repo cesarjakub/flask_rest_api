@@ -16,7 +16,7 @@ app.config['MYSQL_USER'] = os.getenv('DB_USER')
 
 mysql = MySQL(app)
 
-
+#api/blog rotes
 @app.route('/api/blog/', methods=['GET'])
 def get_all_blog_posts():
     if "user" not in session:
@@ -38,8 +38,47 @@ def get_blog_post(id):
         return jsonify(blog_post)
     else:
         return abort(404)
+    
+@app.route('/api/blog/<int:id>', methods=['DELETE'])
+def delete_blog_post(id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+    cursor = mysql.connection.cursor()
+    cursor.execute("DELETE FROM blog_posts WHERE id = %s", (id,))
+    blog_post = cursor.fetchone()
+    if blog_post:
+        return jsonify(blog_post)
+    else:
+        return abort(404)
+    
+@app.route('/api/blog/<int:id>', methods=['PATCH'])
+def update_blog_post(id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    data = request.get_json()
+    new_title = data.get('title')
+    new_content = data.get('content')
+
+    if not new_title and not new_content:
+        return abort(404)
+
+    cursor = mysql.connection.cursor()
+    update_query = "UPDATE blog_posts SET title = %s, content = %s WHERE id = %s"
+    cursor.execute(update_query, (new_title, new_content, id))
+    mysql.connection.commit()
+
+    cursor.execute("SELECT * FROM blog_posts WHERE id = %s", (id,))
+    updated_blog_post = cursor.fetchone()
+
+    if updated_blog_post:
+        return jsonify(updated_blog_post)
+    else:
+        return abort(404)
 
 
+
+#html routes
 @app.route("/", methods=["POST", "GET"])
 def index():
     if "user" in session:
@@ -70,9 +109,10 @@ def login():
         cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
         user = cursor.fetchone()
         cursor.close()
-        print(user)
         if user and check_password(password, user[3]) and check_username(username, user[1]):
             session["user"] = user
+            if check_password("admin", user[3]) and check_username("admin", user[1]):
+                return redirect(url_for("admin"))
             return redirect(url_for("index"))
         else:
             return redirect(url_for("login"))
@@ -85,7 +125,36 @@ def check_password(user_pass, db_pass):
 def check_username(user_name, db_name):
     return user_name == db_name
 
+@app.route("/admin", methods=["POST", "GET"])
+def admin():
+    if "user" in session:
+        user = session["user"]
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM blog_posts INNER JOIN users on blog_posts.author_id = users.user_id")
+        blog_posts = cursor.fetchall()
+        cursor.close()
+        if request.method == "POST":
+            if "id_del" in request.form: 
+                id_del = request.form["id_del"]
 
+                cursor = mysql.connection.cursor()
+                cursor.execute("DELETE FROM blog_posts WHERE post_id = %s", (id_del))
+                mysql.connection.commit()
+                cursor.close()
+                return redirect(url_for("admin"))
+            if "id_upt" in request.form:
+                id_upt = request.form["id_upt"]
+                title = request.form["title"]
+                content = request.form["content"]
+
+                cursor = mysql.connection.cursor()
+                cursor.execute("UPDATE blog_posts SET title = %s, content = %s WHERE post_id = %s", (title, content, id_upt))
+                mysql.connection.commit()
+                cursor.close()
+                return redirect(url_for("admin"))
+        return  render_template("admin.html", blog_posts = blog_posts)
+    else:
+        return redirect(url_for("login"))
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
@@ -100,6 +169,7 @@ def register():
         return redirect(url_for("login"))
     else:    
         return render_template("register.html")
+    
 
 @app.errorhandler(404)
 def page_not_found(e):

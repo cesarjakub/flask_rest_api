@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin panel</title>
+</head>
+<body>
+    
+<div class="container-lg">
+    <nav class="navbar">
+        <div class="container-fluid d-flex justify-content-center">
+          <h1><a class="navbar-brand" href="/adminpanel">Admin panel</a></h1>
+        </div>
+    </nav>
+
+    <div class="d-flex flex-column justify-content-center">
+        {% for p in blog_posts %}
+        <h6> ID: {{ p[0] }}</h6>
+        <h3>Title: {{ p[1] }}</h3>
+        <p>Content: {{ p[2] }}</p>
+        <p>{{ p[3] }} | {{ p[6] }}</p>
+        {% endfor %}
+    </div>
+    <hr>
+    <div class="">
+        <form class="row g-3" action="#" method="POST">
+            <div class="col-md-3">
+                <input type="number" class="form-control" placeholder="ID" name="id_del" required>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-danger" type="submit">DELETE</button>
+            </div>
+        </form>
+        <form class="row g-3" action="#" method="POST">
+            <div class="col-md-3">
+                <input type="number" class="form-control" placeholder="ID" name="id_upt" required>
+              </div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" placeholder="Title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Content" name="content" required>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-warning" type="submit">UPDATE</button>
+            </div>
+        </form>
+      </div>
+
+    <div class="d-flex justify-content-center">
+        <a type="button" class="btn btn-outline-success" href="/logout">Log Out</a>
+    </div>
+</div>
+
+</body>
+</html>
