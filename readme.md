@@ -4,10 +4,6 @@
 
 Tato webová aplikace je napsaná v jazyce Python s využitím frameworku Flask. Poskytuje REST API pro správu blogových příspěvků. Aplikace obsahuje frontend, kde existuje předem vytvořený uživatel s rolí admin. Přihlášením se jako admin máte možnost aktualizovat a mazat příspěvky. Běžný uživatel může pouze vytvářet nové příspěvky.
 
-## Web
-
-Web běží na ubuntu serveru na portu 5000 [http://138.68.93.217:5000/](http://138.68.93.217:5000/)
-
 ## Instalace
 
 1. Stáhněte repozitář do svého lokálního prostoru.
